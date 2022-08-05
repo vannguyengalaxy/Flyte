@@ -4,17 +4,17 @@
 
 *** **prerequisites**: 
 
-- [configure local kubectl to connect to EKS](https://kerneltalks.com/commands/how-to-configure-kubectl-for-aws-eks/)
-- make sure the connection with flytectl CLI and kubectl is working. Run the following command:
+- [Configure local kubectl to connect to EKS](https://kerneltalks.com/commands/how-to-configure-kubectl-for-aws-eks/)
+- Make sure the connection with flytectl CLI and kubectl is working. Run the following command:
+ 
+   ` export FLYTE_PROJECT_PATH=<path-to-project-directory>`
 
-    
-    export FLYTE_PROJECT_PATH=<path-to-project-directory>
-    $FLYTE_PROJECT_PATH/flytectl_connection.sh
+    `$FLYTE_PROJECT_PATH/flytectl_connection.sh`
 
 
-- logged into a docker registry
+- Logged into a docker registry
 
-Step 1: package workflow.
+Step 1: Package workflow.
 
 
     $FLYTE_PROJECT_PATH/package_workflow.sh.sh -i <IMAGE_NAME> -r <DOCKER_REGISTRY> -v <VERSION>
