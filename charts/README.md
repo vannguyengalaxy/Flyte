@@ -36,5 +36,5 @@ Step 3: Install spark-operator:
 
 Step 4: Upgrade helm
 
-    helm upgrade -n flyte -f $CHART_PATH/flyte-core/values-eks-native.yaml -f $CHART_PATH/flyte-core/values-override.yaml --create-namespace flyte $CHART_PATH/flyte-core/
+    helm upgrade -n flyte -f $CHART_PATH/flyte-core/values-eks-native.yaml -f $CHART_PATH/flyte-core/values-eks-spark-override.yaml --create-namespace flyte $CHART_PATH/flyte-core/
 
