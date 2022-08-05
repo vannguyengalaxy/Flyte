@@ -26,7 +26,14 @@ Step 1: Follow [deployment flyte docs](https://docs.flyte.org/en/latest/deployme
 
 Step 2: Installing Flyte.
 
-    export $CHART_PATH=<path-to-charts>
+* setting env variable
+
+
+    export CHART_PATH=<path-to-charts>
+* installing:
+
+
+
     helm install -n flyte -f $CHART_PATH/flyte-core/values-eks-native.yaml --create-namespace flyte $CHART_PATH/flyte-core/
 
 

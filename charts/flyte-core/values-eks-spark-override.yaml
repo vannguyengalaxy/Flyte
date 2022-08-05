@@ -11,19 +11,19 @@ cluster_resource_manager:
       customData:
         - production:
             - projectQuotaCpu:
-                value: "5"
+                value: "1"
             - projectQuotaMemory:
-                value: "4000Mi"
+                value: "1000Mi"
         - staging:
             - projectQuotaCpu:
-                value: "2"
+                value: "1"
             - projectQuotaMemory:
-                value: "3000Mi"
+                value: "1000Mi"
         - development:
             - projectQuotaCpu:
-                value: "4"
+                value: "1"
             - projectQuotaMemory:
-                value: "3000Mi"
+                value: "1000Mi"
       refresh: 5m
 
   # -- Resource templates that should be applied
@@ -53,7 +53,7 @@ cluster_resource_manager:
 
     - key: ac_spark_role
       value: |
-        apiVersion: rbac.authorization.k8s.io/v1beta1
+        apiVersion: rbac.authorization.k8s.io/v1
         kind: Role
         metadata:
           name: spark-role
@@ -85,7 +85,7 @@ cluster_resource_manager:
 
     - key: ae_spark_role_binding
       value: |
-        apiVersion: rbac.authorization.k8s.io/v1beta1
+        apiVersion: rbac.authorization.k8s.io/v1
         kind: RoleBinding
         metadata:
           name: spark-role-binding
