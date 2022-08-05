@@ -26,15 +26,15 @@ Step 1: Follow [deployment flyte docs](https://docs.flyte.org/en/latest/deployme
 
 Step 2: Installing Flyte.
 
-    export $FLYTE_HOME=<path-to-charts>
-    helm install -n flyte -f $CHART_HOME/flyte-core/values-eks-native.yaml --create-namespace flyte $CHART_HOME/flyte-core/
+    export $CHART_PATH=<path-to-charts>
+    helm install -n flyte -f $CHART_PATH/flyte-core/values-eks-native.yaml --create-namespace flyte $CHART_PATH/flyte-core/
 
 
 Step 3: Install spark-operator:
 
-    helm install -n spark-operator -f $CHART_HOME/spark-operator-chart/values.yaml spark-operator $CHART_HOME/spark-operator-chart --create-namespace
+    helm install -n spark-operator -f $CHART_PATH/spark-operator-chart/values.yaml spark-operator $CHART_PATH/spark-operator-chart --create-namespace
 
 Step 4: Upgrade helm
 
-    helm upgrade -n flyte -f $CHART_HOME/flyte-core/values-eks-native.yaml -f $CHART_HOME/flyte-core/values-override.yaml --create-namespace flyte $CHART_HOME/flyte-core/
+    helm upgrade -n flyte -f $CHART_PATH/flyte-core/values-eks-native.yaml -f $CHART_PATH/flyte-core/values-override.yaml --create-namespace flyte $CHART_PATH/flyte-core/
 
