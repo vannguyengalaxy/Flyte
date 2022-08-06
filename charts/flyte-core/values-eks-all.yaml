@@ -12,7 +12,7 @@ userSettings:
 #
 
 flyteadmin:
-  replicaCount: 2
+  replicaCount: 1
   # -- IAM role for SA: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
   serviceAccount:
     # -- If the service account is created by you, make this false, else a new service account will be created and the iam-role-flyte will be added
@@ -47,7 +47,7 @@ flytescheduler: {}
 #
 
 datacatalog:
-  replicaCount: 2
+  replicaCount: 1
   serviceAccount:
     # -- If the service account is created by you, make this false
     create: true
@@ -74,7 +74,7 @@ datacatalog:
 #
 
 flytepropeller:
-  replicaCount: 2
+  replicaCount: 1
   manager: false
   serviceAccount:
     # -- If the service account is created by you, make this false
@@ -106,7 +106,7 @@ flytepropeller:
 #
 
 flyteconsole:
-  replicaCount: 2
+  replicaCount: 1
   resources:
     limits:
       cpu: 250m
@@ -264,6 +264,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - spark
         #          - sagemaker_hyperparameter_tuning
         #          - sagemaker_custom_training
         #          - sagemaker_training
@@ -271,6 +272,7 @@ configmap:
           container: container
           sidecar: sidecar
           container_array: k8s-array
+          spark: spark
   #          sagemaker_custom_training_task: sagemaker_custom_training
   #          sagemaker_custom_training_job_task: sagemaker_custom_training
 
@@ -334,30 +336,30 @@ cluster_resource_manager:
   # -- Starts the cluster resource manager in standalone mode with requisite auth credentials to call flyteadmin service endpoints
   standalone_deploy: false
   config:
+    # -- ClusterResource parameters
+    # Refer to the [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ClusterResourceConfig) to customize.
     cluster_resources:
+      refreshInterval: 5m
+      templatePath: "/etc/flyte/clusterresource/templates"
       customData:
         - production:
             - projectQuotaCpu:
-                value: "5"
+                value: "1"
             - projectQuotaMemory:
-                value: "4000Mi"
-            - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: "1000Mi"
         - staging:
             - projectQuotaCpu:
-                value: "2"
+                value: "1"
             - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: "1000Mi"
         - development:
             - projectQuotaCpu:
-                value: "4"
+                value: "1"
             - projectQuotaMemory:
-                value: "3000Mi"
-            - defaultIamRole:
-                value: "arn:aws:iam::{{ .Values.userSettings.accountNumber }}:role/flyte-user-role"
+                value: "1000Mi"
+      refresh: 5m
 
+  # -- Resource templates that should be applied
   templates:
     # -- Template for namespaces resources
     - key: aa_namespace
@@ -369,17 +371,6 @@ cluster_resource_manager:
         spec:
           finalizers:
           - kubernetes
-
-    # -- Patch default service account
-    - key: aab_default_service_account
-      value: |
-        apiVersion: v1
-        kind: ServiceAccount
-        metadata:
-          name: default
-          namespace: {{ namespace }}
-          annotations:
-            eks.amazonaws.com/role-arn: {{ defaultIamRole }}
 
     - key: ab_project_resource_quota
       value: |
@@ -393,11 +384,75 @@ cluster_resource_manager:
             limits.cpu: {{ projectQuotaCpu }}
             limits.memory: {{ projectQuotaMemory }}
 
+    - key: ac_spark_role
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: Role
+        metadata:
+          name: spark-role
+          namespace: {{ namespace }}
+        rules:
+        - apiGroups: ["*"]
+          resources:
+          - pods
+          verbs:
+          - '*'
+        - apiGroups: ["*"]
+          resources:
+          - services
+          verbs:
+          - '*'
+        - apiGroups: ["*"]
+          resources:
+          - configmaps
+          verbs:
+          - '*'
 
+    - key: ad_spark_service_account
+      value: |
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: spark
+          namespace: {{ namespace }}
 
-#
-# SPARKOPERATOR
-#
+    - key: ae_spark_role_binding
+      value: |
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: RoleBinding
+        metadata:
+          name: spark-role-binding
+          namespace: {{ namespace }}
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: Role
+          name: spark-role
+        subjects:
+        - kind: ServiceAccount
+          name: spark
+          namespace: {{ namespace }}
 
 sparkoperator:
-  enabled: false
+  enabled: true
+  plugin_config:
+    plugins:
+      spark:
+        # -- Spark default configuration
+        spark-config-default:
+          # We override the default credentials chain provider for Hadoop so that
+          # it can use the serviceAccount based IAM role or ec2 metadata based.
+          # This is more in line with how AWS works
+          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
+          - spark.kubernetes.allocation.batch.size: "50"
+          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
+          - spark.excludeOnFailure.enabled: "true"
+          - spark.excludeOnFailure.timeout: "5m"
+          - spark.task.maxfailures: "8"
