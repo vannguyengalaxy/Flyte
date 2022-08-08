@@ -14,14 +14,18 @@
 
 - Logged into a docker registry
 
-Step 1: Package workflow.
+Step 1: 
+
+    source $FLYTE_PROJECT_PATH/venv/bin/activate
+
+Step 2: Package workflow.
 
 
-    $FLYTE_PROJECT_PATH/package_workflow.sh.sh -i <IMAGE_NAME> -r <DOCKER_REGISTRY> -v <VERSION>
+    $FLYTE_PROJECT_PATH/package_workflow.sh -i <IMAGE_NAME> -r <DOCKER_REGISTRY> -v <VERSION>
 
 _example: $FLYTE_PROJECT_PATH/package_workflow.sh.sh -i spark-sql -r ghcr.io/vannguyengalaxy -v v1_
 
-Step 2: Register workflow using local tgz file. (_note: the image in the docker registry need to have public access_)
+Step 3: Register workflow using local tgz file. (_note: the image in the docker registry need to have public access_)
 
 
     flytectl register files --config ~/.flyte/config.yaml  --project <PROJECT_NAME> --domain <DOMAIN_NAME> --archive flyte-package.tgz --version <VERSION>
@@ -29,7 +33,7 @@ Step 2: Register workflow using local tgz file. (_note: the image in the docker 
 
 _example: flytectl register files --config ~/.flyte/config.yaml  --project flytesnacks --domain development --archive flyte-package.tgz --version v1_
 
-Step 3: Open Flyte UI and launch workflow
+Step 4: Open Flyte UI and launch workflow
 
 
 ## NOTE

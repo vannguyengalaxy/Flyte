@@ -28,12 +28,15 @@ Step 2: Setting env variable
 
     export CHART_PATH=<path-to-charts-directory>
 
-Step 2: Install spark-operator:
+Step 3: Install spark-operator:
 
     helm install -n spark-operator -f $CHART_PATH/spark-operator-chart/values.yaml spark-operator $CHART_PATH/spark-operator-chart --create-namespace
 
+Step 4: Install ingress nginx
 
-Step 3: Installing Flyte.
+    helm install -n ingress-nginx ingress-nginx  -f values.yaml .
+
+Step 5: Installing Flyte.
 
     helm install -n flyte -f $CHART_PATH/flyte-core/values-eks-all.yaml --create-namespace flyte $CHART_PATH/flyte-core/
 
