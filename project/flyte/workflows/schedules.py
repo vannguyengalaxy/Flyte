@@ -16,7 +16,7 @@ Check out a demo of how the Native Scheduler works:
 # Consider the following example workflow:
 from datetime import datetime
 
-from flytekit import task, workflow
+from flytekit import task, workflow, Slack, WorkflowExecutionPhase, Email
 
 
 @task
@@ -50,4 +50,22 @@ cron_lp = LaunchPlan.get_or_create(
         schedule="*/1 * * * *",  # Following schedule runs every min
         kickoff_time_input_arg="kickoff_time",
     ),
+    notifications=[
+        Email(
+            phases=[WorkflowExecutionPhase.FAILED],
+            recipients_email=["vannh@galaxy.com.vn"],
+        ),
+        Email(
+            phases=[WorkflowExecutionPhase.SUCCEEDED],
+            recipients_email=["vannh@galaxy.com.vn"],
+        ),
+        Slack(
+            phases=[
+                WorkflowExecutionPhase.SUCCEEDED,
+                WorkflowExecutionPhase.ABORTED,
+                WorkflowExecutionPhase.TIMED_OUT,
+            ],
+            recipients_email=["vannh@galaxy.com.vn"],
+        ),
+    ],
 )

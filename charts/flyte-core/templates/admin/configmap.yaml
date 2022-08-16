@@ -43,7 +43,7 @@ data:
 {{- end }}
 {{- if .Values.workflow_notifications.enabled }}
   {{- with .Values.workflow_notifications.config }}
-  notifications.yaml: | {{ tpl (toYaml .) $ | nindent 4 }}
+  notifications.yaml: | {{ toYaml . | nindent 4 }}
   {{- end }}
 {{- end }}
 {{- if .Values.external_events.enable }}

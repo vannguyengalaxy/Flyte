@@ -229,6 +229,7 @@ configmap:
       workers: 40
       gc-interval: 12h
       max-workflow-retries: 50
+      max-ttl-hours: 23
       kube-client-config:
         qps: 100
         burst: 25
@@ -310,19 +311,19 @@ workflow_scheduler:
 # Workflow notifications module is an optional dependency. Flyte uses cloud native pub-sub systems to notify users of
 # various events in their workflows
 workflow_notifications:
-  enabled: false
+  enabled: true
   config:
     notifications:
       type: aws
-      region: "{{ .Values.userSettings.accountRegion }}"
+      region: "ap-southeast-1"
       publisher:
-        topicName: "arn:aws:sns:{{ .Values.userSettings.accountRegion }}:{{ .Values.userSettings.accountNumber }}:flyte-notifications-topic"
+        topicName: "arn:aws:sns:ap-southeast-1:673279459419:flyte-notifications-topic"
       processor:
         queueName: flyte-notifications-queue
-        accountId: "{{ .Values.userSettings.accountNumber }}"
+        accountId: "673279459419"
       emailer:
         subject: "Flyte: {{ project }}/{{ domain }}/{{ launch_plan.name }} has '{{ phase }}'"
-        sender: "flyte@example.com"
+        sender: "nguyenhuuvan.39@gmail.com"
         body: |
           Execution {{ workflow.project }}/{{ workflow.domain }}/{{ workflow.name }}/{{ name }} has {{ phase }}.
           Details: https://flyte.example.com/console/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}.
