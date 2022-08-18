@@ -34,7 +34,13 @@ Step 3: Install spark-operator:
 
 Step 4: Install ingress nginx
 
-    helm install -n ingress-nginx ingress-nginx  -f values.yaml .
+4.1. Label node
+
+    kubectl label node <name_node> runingress=nginx
+
+4.2. Lnstall chart
+
+    helm install -n ingress-nginx --create-namespace ingress-nginx  -f values.yaml . 
 
 Step 5: Installing Flyte.
 
