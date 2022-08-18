@@ -178,6 +178,20 @@ storage:
   signedUrl:
     stowConfigOverride:
       endpoint: http://localhost:30084
+{{- else if eq .Values.storage.type "minio" }}
+  type: minio
+  container: {{ .Values.storage.bucketName | quote }}
+  stow:
+    kind: s3
+    config:
+      access_key_id: {{ .Values.storage.minio.accessKey }}
+      auth_type: accesskey
+      secret_key: {{ .Values.storage.minio.secretKey }}
+      disable_ssl: true
+      endpoint: {{ .Values.storage.minio.endpoint }}
+  signedUrl:
+    stowConfigOverride:
+      endpoint: http://localhost:30084
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
   {{ tpl (toYaml .) $ | nindent 2 }}
