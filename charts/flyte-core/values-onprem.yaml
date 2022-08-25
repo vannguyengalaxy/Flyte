@@ -99,13 +99,13 @@ flytepropeller:
     pullPolicy: IfNotPresent
   resources:
     limits:
-      cpu: 2
-      ephemeral-storage: 2Gi
-      memory: 3Gi
+      cpu: 1
+      ephemeral-storage: 1Gi
+      memory: 2Gi
     requests:
-      cpu: 2
-      ephemeral-storage: 2Gi
-      memory: 3Gi
+      cpu: 1
+      ephemeral-storage: 1Gi
+      memory: 2Gi
   cacheSizeMbs: 1024
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: "system-cluster-critical"
