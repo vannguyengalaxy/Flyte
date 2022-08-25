@@ -99,13 +99,13 @@ flytepropeller:
     pullPolicy: IfNotPresent
   resources:
     limits:
-      cpu: 1
-      ephemeral-storage: 1Gi
-      memory: 2Gi
+      cpu: 2
+      ephemeral-storage: 2Gi
+      memory: 3Gi
     requests:
-      cpu: 1
-      ephemeral-storage: 1Gi
-      memory: 2Gi
+      cpu: 2
+      ephemeral-storage: 2Gi
+      memory: 3Gi
   cacheSizeMbs: 1024
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: "system-cluster-critical"
@@ -453,6 +453,20 @@ cluster_resource_manager:
         metadata:
           name: spark
           namespace: {{ namespace }}
+        imagePullSecrets:
+          - name: dockerconfigjson-github
+
+    - key: ad_spark_secret
+      value: |
+        apiVersion: v1
+        kind: Secret
+        type: kubernetes.io/dockerconfigjson
+        metadata:
+          name: dockerconfigjson-github
+          namespace: {{ namespace }}
+        data:
+          .dockerconfigjson: eyJhdXRocyI6eyJnaGNyLmlvIjp7ImF1dGgiOiJkbUZ1Ym1ndFoyeDRPbWRvY0Y5dFMwcEdPWHAxUW1aQlNVaDNhbFJEUzB4UlQxTXdaWHBGZGpCbFVXMHpibXhLWW5JPSJ9fX0=
+
 
     - key: ae_spark_role_binding
       value: |
